@@ -1,0 +1,27 @@
+{% extends "polls_app/base.html" %}
+
+{% block title %}
+    Results
+{% endblock title %}
+
+
+
+{% block content %}
+    <h2>Results of "{{ poll.question_text }}":</h2>
+
+        {% if poll.answer_type == '1' or poll.answer_type == 'N' %}
+            <ul>
+                {% for choice in poll.choice_set.all %}
+                    <li>{{ choice.choice_text}} get {{ choice.votes }} votes</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p> Users answers are:</p>
+            <ul>
+                {% for choice in poll.choice_set.all %}
+                    <li>{{ choice.choice_text}} (get {{ choice.votes }} answers)</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+{% endblock content %}

@@ -1,0 +1,27 @@
+{% extends "polls_app/base.html" %}
+
+
+{% block title %}
+    All Polls
+{% endblock title %}
+
+
+{% block content %}
+
+    {% if not polls %}
+        <h3>there are no polls yet</h3>
+    {% else %}
+        <ul>
+        {% for poll in polls %}
+            {% if poll.answer_type == 'user_text' %}
+            <li><a href="{% url 'polls_app:text_poll' poll.id %}">{{ poll.title }}</a>
+                ends at {{ poll.date_ended|date:'H:i, d M Y' }} (UTC)</li>
+
+            {% else %}
+            <li><a href="{% url 'polls_app:poll' poll.id %}">{{ poll.title }}</a>
+                ends at {{ poll.date_ended|date:'H:i, d M Y' }} (UTC)</li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock content %}

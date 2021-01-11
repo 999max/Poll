@@ -1,0 +1,25 @@
+{% extends "polls_app/base.html" %}
+
+{% block title %}
+    Text question
+{% endblock title %}
+
+
+{% block content %}
+    {% if time_expired %}
+        <p>Voting was closed at {{ poll.date_ended|date:'H:i, d M Y' }} (UTC).</p>
+        <p><a href="{% url 'polls_app:results' poll.id %}">See results</a></p>
+
+    {% else %}
+        <h2>Make your answer</h2>
+        <h4>Theme: {{ poll.title }}</h4>
+        <p>{{ poll.question_text }}</p>
+
+        <form action="{% url 'polls_app:make_text_vote' poll.id %}" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button name="submit">Add answer</button>
+        </form>
+    {% endif %}
+
+{% endblock content %}

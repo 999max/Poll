@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+        {% endblock title %} - Polls App</title>
+</head>
+<body>
+<div align="left">
+    <a href="{% url 'polls_app:index' %}">Home</a>
+    <a href="{% url 'polls_app:polls' %}">Active polls</a>
+    <a href="{% url 'polls_app:completed' %}">Completed polls</a>
+</div>
+<div align="right">
+    {% if user.is_authenticated %}
+    <b>{{ user.username }}</b>
+        <a href="{% url 'users:logout' %}">LogOut</a>
+    {% else %}
+        <a href="{% url 'users:login' %}">LogIn</a>
+        <a href="{% url 'users:register' %}">Registration</a>
+    {% endif %}
+    <a href="{% url 'admin:index' %}">Admin site</a>
+</div>
+<br><hr>
+
+{% block content %}
+
+{% endblock content %}
+
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+{% extends "polls_app/base.html" %}
+
+
+{% block title %}
+    Registration
+{% endblock title %}
+
+
+{% block content %}
+
+    <form method="post" action="{% url 'users:register' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button name="submit">Register</button>
+        <input type="hidden" name="next"
+               value="{% url 'polls_app:index' %}" />
+
+    </form>
+
+{% endblock content %}

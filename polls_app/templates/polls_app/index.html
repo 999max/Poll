@@ -1,0 +1,13 @@
+{% extends "polls_app/base.html" %}
+
+
+{% block title %}
+    Welcome to polls!
+{% endblock title %}
+
+
+{% block content %}
+    <h2>Welcome to Polls!</h2>
+    <p>Here you can take part in the voting and see it's results.</p>
+    <p><a href="{% url 'polls_app:polls' %}">Go to Polls</a></p>
+{% endblock content %}
