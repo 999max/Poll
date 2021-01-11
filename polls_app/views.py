@@ -33,18 +33,7 @@ def poll(request, pk):
 def text_poll(request, pk):
     poll = get_object_or_404(Poll, pk=pk)
     time_expired = timezone.now() > poll.date_ended
-
-    if request.method != 'POST':
-        form = ChoiceForm()
-    else:
-        form = ChoiceForm(data=request.POST)
-        if form.is_valid():
-            user_choice = form.save(commit=False)
-            user_choice.question = poll
-            user_choice.passed_users = request.user
-            user_choice.save()
-            return redirect('polls_app:results', pk=pk)
-
+    form = ChoiceForm()
     context = {'poll': poll, 'time_expired': time_expired, 'form': form}
     return render(request, 'polls_app/text_poll.html', context)
 
@@ -61,7 +50,7 @@ def make_vote(request, pk):
         if 'choice' in key:
             selected_choice = poll.choice_set.get(pk=choice_id)
             selected_choice.votes += 1
-            # selected_choice.passed_users = request.user  # FIXME
+            selected_choice.passed_users.add(request.user)
             selected_choice.save()
 
     return redirect('polls_app:results', pk=pk)
@@ -69,19 +58,14 @@ def make_vote(request, pk):
 
 def make_text_vote(request, pk):
     poll = get_object_or_404(Poll, pk=pk)
-
-    if request.method != 'POST':
-        form = ChoiceForm()
-        return render(request, 'polls_app/poll.html', {'form': form})
-    else:
-        form = ChoiceForm(data=request.POST)
-        if form.is_valid():
-            user_choice = form.save(commit=False)
-            user_choice.question = poll
-            user_choice.votes += 1
-            # user_choice.passed_users = request.user   # FIXME
-            user_choice.save()
-        return redirect('polls_app:results', pk=pk)
+    form = ChoiceForm(data=request.POST)
+    if form.is_valid():
+        user_choice = form.save(commit=False)
+        user_choice.question = poll
+        user_choice.votes += 1
+        # user_choice.passed_users.add(request.user)   # FIXME
+        user_choice.save()
+    return redirect('polls_app:results', pk=pk)
 
 
 def results(request, pk):
