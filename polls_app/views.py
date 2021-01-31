@@ -26,15 +26,9 @@ class PollView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['time_expired'] = timezone.now() > Poll.objects.get(pk=self.kwargs.get('pk')).date_ended
+        if self.object.answer_type == 'user_text':
+            context['form'] = ChoiceForm()
         return context
-
-
-def text_poll(request, pk):
-    poll = get_object_or_404(Poll, pk=pk)
-    time_expired = timezone.now() > poll.date_ended
-    form = ChoiceForm()
-    context = {'poll': poll, 'time_expired': time_expired, 'form': form}
-    return render(request, 'polls_app/text_poll.html', context)
 
 
 class CompletedPollsView(generic.ListView):
