@@ -12,5 +12,5 @@ urlpatterns = [
     path('polls/<int:pk>/make_vote/', views.make_vote, name='make_vote'),
     path('polls/<int:pk>/make_text_vote/', views.make_text_vote, name='make_text_vote'),
     path('polls/<int:pk>/results/', views.results, name='results'),
-    path('polls/completed/', views.completed, name='completed'),
+    path('polls/completed/', views.CompletedPollsView.as_view(), name='completed'),
 ]

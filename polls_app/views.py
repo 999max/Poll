@@ -37,9 +37,12 @@ def text_poll(request, pk):
     return render(request, 'polls_app/text_poll.html', context)
 
 
-def completed(request):
-    polls = Poll.objects.filter(date_ended__lte=timezone.now())
-    return render(request, 'polls_app/completed.html', {'polls': polls})
+class CompletedPollsView(generic.ListView):
+    template_name = "polls_app/completed.html"
+    context_object_name = "polls"
+
+    def get_queryset(self):
+        return Poll.objects.filter(date_ended__lte=timezone.now())
 
 
 def make_vote(request, pk):
