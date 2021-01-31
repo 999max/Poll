@@ -5,12 +5,12 @@ from .models import Poll, Choice
 class ChoiceInline(admin.TabularInline):
     model = Choice
     extra = 1
-    exclude = ('votes', 'passed_users')
+    exclude = ('votes', 'passed_users',)
 
 
 class PollAdmin(admin.ModelAdmin):
     inlines = [ChoiceInline]
-    exclude = ('date_added', 'passed_users',)
+    readonly_fields = ('date_added', 'passed_users',)
 
 
 class ChoiceAdmin(admin.ModelAdmin):

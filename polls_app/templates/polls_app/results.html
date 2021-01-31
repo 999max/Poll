@@ -9,7 +9,7 @@
 {% block content %}
     <h2>Results of "{{ poll.question_text }}":</h2>
 
-        {% if poll.answer_type == '1' or poll.answer_type == 'N' %}
+        {% if poll.answer_type != 'user_text' %}
             <ul>
                 {% for choice in poll.choice_set.all %}
                     <li>{{ choice.choice_text}} get {{ choice.votes }} votes</li>
@@ -19,7 +19,7 @@
             <p> Users answers are:</p>
             <ul>
                 {% for choice in poll.choice_set.all %}
-                    <li>{{ choice.choice_text}} (get {{ choice.votes }} answers)</li>
+                    <li>{{ choice.choice_text}}</li>
                 {% endfor %}
             </ul>
         {% endif %}

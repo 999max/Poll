@@ -13,32 +13,39 @@
         <p><a href="{% url 'polls_app:results' poll.id %}">See results</a></p>
 
     {% else %}
-        <h2>Make your decision</h2>
+        <h2>Make your answer</h2>
         <h4>Theme: {{ poll.title }}</h4>
         <p>{{ poll.question_text }}</p>
 
+        {% if poll.answer_type != 'user_text' %}
+            <form action="{% url 'polls_app:make_vote' poll.id %}" method="post">
+                {% csrf_token %}
+                {% if poll.answer_type == '1' %}
+                    {% for choice in poll.choice_set.all %}
+                        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+                            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+                    {% endfor %}
 
-        <form action="{% url 'polls_app:make_vote' poll.id %}" method="post">
-            {% csrf_token %}
-            {% if poll.answer_type == '1' %}
+                {% elif poll.answer_type == 'N' %}
+                <ul>
+                    {% for choice in poll.choice_set.all %}
+                    <li><input type="checkbox" name="choice{{ forloop.counter }}" value="{{ choice.id }}">
+                        {{ choice.choice_text }}
+                    </li>
+                    {% endfor %}
+                </ul>
 
-                {% for choice in choices %}
-                    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-                        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-                {% endfor %}
+                {% endif %}
+                <input type="submit" value="Submit">
+            </form>
+        {% else %}
+            <form action="{% url 'polls_app:make_text_vote' poll.id %}" method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button name="submit">Add answer</button>
+            </form>
+        {% endif %}
 
-
-            {% elif poll.answer_type == 'N' %}
-            <ul>
-                {% for choice in choices %}
-                <li><input type="checkbox" name="choice{{ forloop.counter }}" value="{{ choice.id }}">
-                    {{ choice.choice_text }}
-                </li>
-                {% endfor %}
-            </ul>
-
-            {% endif %}
-            <input type="submit" value="Submit">
-        </form>
+        <p><a href="{% url 'polls_app:results' poll.id %}">Show results</a></p>
     {% endif %}
 {% endblock content %}

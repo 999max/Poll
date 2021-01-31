@@ -14,7 +14,7 @@ class Poll(models.Model):
     question_text = models.TextField()
     date_added = models.DateTimeField(auto_now_add=True, verbose_name="Poll's start date")
     date_ended = models.DateTimeField(verbose_name="Poll's end date")
-    answer_type = models.CharField(max_length=150, choices=CHOICE_TYPES, default='one choice')
+    answer_type = models.CharField(max_length=150, choices=CHOICE_TYPES, default='1')
     passed_users = models.ManyToManyField(User, null=True, blank=True)
 
     def __str__(self):
