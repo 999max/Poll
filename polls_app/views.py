@@ -19,14 +19,14 @@ class PollsView(generic.ListView):
         return Poll.objects.filter(date_ended__gte=timezone.now())
 
 
-def poll(request, pk):
-    poll = get_object_or_404(Poll, pk=pk)
-    choices = poll.choice_set.all()
-    answer_type = poll.answer_type  # FIXME?
-    time_expired = timezone.now() > poll.date_ended
-    context = {'poll': poll, 'choices': choices,
-               'time_expired': time_expired, 'answer_type': answer_type}
-    return render(request, 'polls_app/poll.html', context)
+class PollView(generic.DetailView):
+    model = Poll
+    template_name = 'polls_app/poll.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['time_expired'] = timezone.now() > Poll.objects.get(pk=self.kwargs.get('pk')).date_ended
+        return context
 
 
 def text_poll(request, pk):
@@ -70,13 +70,12 @@ def make_text_vote(request, pk):
     return redirect('polls_app:results', pk=pk)
 
 
-def results(request, pk):
-    poll = get_object_or_404(Poll, pk=pk)
-    context = {'poll': poll}
-    return render(request, 'polls_app/results.html', context)
+class ResultsView(generic.DetailView):
+    model = Poll
+    template_name = "polls_app/results.html"
 
 
-##  serializers
+# serializers
 class PollViewSet(viewsets.ModelViewSet):
     serializer_class = PollSerializer
     queryset = Poll.objects.all()
@@ -85,3 +84,4 @@ class PollViewSet(viewsets.ModelViewSet):
 class ChoiceViewSet(viewsets.ModelViewSet):
     serializer_class = ChoiceSerializer
     queryset = Choice.objects.all()
+
