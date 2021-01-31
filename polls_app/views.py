@@ -1,23 +1,22 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
+from django.views import generic
 from rest_framework import viewsets
 from .models import Poll, Choice
 from .forms import ChoiceForm
 from .serializers import PollSerializer, ChoiceSerializer
 
 
-
-# Create your views here.
-
-
 def index(request):
     return render(request, 'polls_app/index.html')
 
 
-def polls(request):
-    polls = Poll.objects.filter(date_ended__gte=timezone.now())
-    context = {'polls': polls}
-    return render(request, 'polls_app/polls.html', context)
+class PollsView(generic.ListView):
+    template_name = "polls_app/polls.html"
+    context_object_name = "polls"
+
+    def get_queryset(self):
+        return Poll.objects.filter(date_ended__gte=timezone.now())
 
 
 def poll(request, pk):
@@ -63,7 +62,7 @@ def make_text_vote(request, pk):
         user_choice = form.save(commit=False)
         user_choice.question = poll
         user_choice.votes += 1
-        # user_choice.passed_users.add(request.user)   # FIXME
+        # user_choice.passed_users.add(request.user)  # FIXME
         user_choice.save()
     return redirect('polls_app:results', pk=pk)
 
