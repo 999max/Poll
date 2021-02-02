@@ -1,5 +1,3 @@
-import datetime
-
 from django.test import TestCase
 from django.utils import timezone
 
@@ -26,9 +24,8 @@ class PollsTestView(TestCase):
                             answer_type='1')
         for i in range(3):
             Poll.objects.create(title=f"poll_{i}", question_text=f"question poll{i}",
-                                date_ended=datetime.datetime.now() + datetime.timedelta(seconds=i+10),
+                                date_ended=timezone.now() + timezone.timedelta(seconds=i + 10),
                                 answer_type='1')
-
 
     def test_polls_view_exist(self):
         response = self.client.get('/polls/')
@@ -73,11 +70,11 @@ class PollsTestView(TestCase):
 class PollTestView(TestCase):
     def setUp(self):
         self.poll_1 = Poll.objects.create(title=f"poll_zero", question_text=f"question poll_zero",
-                            date_ended=timezone.now(),
-                            answer_type='1')
+                                          date_ended=timezone.now(),
+                                          answer_type='1')
         self.poll_2 = Poll.objects.create(title=f"poll_2", question_text=f"question poll_2",
-                            date_ended=timezone.now()+timezone.timedelta(days=1),
-                            answer_type='1')
+                                          date_ended=timezone.now() + timezone.timedelta(seconds=10),
+                                          answer_type='1')
 
     def test_poll_view_get_by_name(self):
         response = self.client.get(reverse('polls_app:poll', kwargs={'pk': 1}))
@@ -92,3 +89,40 @@ class PollTestView(TestCase):
         response = self.client.get(reverse('polls_app:poll', kwargs={'pk': 2}))
         self.assertNotContains(response, 'Voting was closed at')
         self.assertContains(response, 'Make your answer')
+
+
+class CompletedPollsTestView(TestCase):
+    def setUp(self):
+        self.poll_1 = Poll.objects.create(title=f"poll_zero_1", question_text=f"question poll_zero",
+                                          date_ended=timezone.now(),
+                                          answer_type='1')
+        self.poll_2 = Poll.objects.create(title=f"poll_zero_2", question_text=f"question poll_zero_2",
+                                          date_ended=timezone.now(),
+                                          answer_type='1')
+        self.poll_3 = Poll.objects.create(title=f"poll_3", question_text=f"question poll_3",
+                                          date_ended=timezone.now() + timezone.timedelta(seconds=10),
+                                          answer_type='1')
+        self.poll_4 = Poll.objects.create(title=f"poll_4", question_text=f"question poll_4",
+                                          date_ended=timezone.now() + timezone.timedelta(days=10),
+                                          answer_type='1')
+        self.completed_polls = Poll.objects.filter(pk__lte=2)
+
+    def test_completed_view_exist(self):
+        response = self.client.get('/polls/completed/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.template_name[0], 'polls_app/completed.html')
+
+    def test_completed_view_get_by_name(self):
+        response = self.client.get(reverse('polls_app:completed'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'polls_app/completed.html')
+
+    def test_if_first_two_cases_exist(self):
+        response = self.client.get('/polls/completed/')
+        self.assertContains(response, 'poll_zero_1')
+        self.assertContains(response, 'poll_zero_2')
+
+    def test_if_last_two_cases_does_not_exist(self):
+        response = self.client.get('/polls/completed/')
+        self.assertNotContains(response, 'poll_3')
+        self.assertNotContains(response, 'poll_4')
