@@ -25,7 +25,7 @@ class PollView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['time_expired'] = timezone.now() > Poll.objects.get(pk=self.kwargs.get('pk')).date_ended
+        context['time_expired'] = timezone.now() >= Poll.objects.get(pk=self.kwargs.get('pk')).date_ended
         if self.object.answer_type == 'user_text':
             context['form'] = ChoiceForm()
         return context
@@ -78,4 +78,3 @@ class PollViewSet(viewsets.ModelViewSet):
 class ChoiceViewSet(viewsets.ModelViewSet):
     serializer_class = ChoiceSerializer
     queryset = Choice.objects.all()
-
