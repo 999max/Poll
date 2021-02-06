@@ -48,7 +48,7 @@ def make_vote(request, pk):
             selected_choice.votes += 1
             selected_choice.passed_users.add(request.user)
             selected_choice.save()
-
+    poll.passed_users.add(request.user)
     return redirect('polls_app:results', pk=pk)
 
 
@@ -59,8 +59,9 @@ def make_text_vote(request, pk):
         user_choice = form.save(commit=False)
         user_choice.question = poll
         user_choice.votes += 1
-        # user_choice.passed_users.add(request.user)  # FIXME
         user_choice.save()
+        user_choice.passed_users.add(request.user)
+    poll.passed_users.add(request.user)
     return redirect('polls_app:results', pk=pk)
 
 
