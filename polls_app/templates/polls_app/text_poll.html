@@ -20,6 +20,7 @@
             {{ form.as_p }}
             <button name="submit">Add answer</button>
         </form>
+    <p><a href="{% url 'polls_app:results' poll.id %}">Show results</a></p>
     {% endif %}
 
 {% endblock content %}

@@ -1,46 +1,42 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
+from django.views import generic
 from rest_framework import viewsets
 from .models import Poll, Choice
 from .forms import ChoiceForm
 from .serializers import PollSerializer, ChoiceSerializer
 
 
-
-# Create your views here.
-
-
 def index(request):
     return render(request, 'polls_app/index.html')
 
 
-def polls(request):
-    polls = Poll.objects.filter(date_ended__gte=timezone.now())
-    context = {'polls': polls}
-    return render(request, 'polls_app/polls.html', context)
+class PollsView(generic.ListView):
+    template_name = "polls_app/polls.html"
+    context_object_name = "polls"
+
+    def get_queryset(self):
+        return Poll.objects.filter(date_ended__gte=timezone.now())
 
 
-def poll(request, pk):
-    poll = get_object_or_404(Poll, pk=pk)
-    choices = poll.choice_set.all()
-    answer_type = poll.answer_type  # FIXME?
-    time_expired = timezone.now() > poll.date_ended
-    context = {'poll': poll, 'choices': choices,
-               'time_expired': time_expired, 'answer_type': answer_type}
-    return render(request, 'polls_app/poll.html', context)
+class PollView(generic.DetailView):
+    model = Poll
+    template_name = 'polls_app/poll.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['time_expired'] = timezone.now() >= Poll.objects.get(pk=self.kwargs.get('pk')).date_ended
+        if self.object.answer_type == 'user_text':
+            context['form'] = ChoiceForm()
+        return context
 
 
-def text_poll(request, pk):
-    poll = get_object_or_404(Poll, pk=pk)
-    time_expired = timezone.now() > poll.date_ended
-    form = ChoiceForm()
-    context = {'poll': poll, 'time_expired': time_expired, 'form': form}
-    return render(request, 'polls_app/text_poll.html', context)
+class CompletedPollsView(generic.ListView):
+    template_name = "polls_app/completed.html"
+    context_object_name = "polls"
 
-
-def completed(request):
-    polls = Poll.objects.filter(date_ended__lte=timezone.now())
-    return render(request, 'polls_app/completed.html', {'polls': polls})
+    def get_queryset(self):
+        return Poll.objects.filter(date_ended__lte=timezone.now())
 
 
 def make_vote(request, pk):
@@ -52,7 +48,7 @@ def make_vote(request, pk):
             selected_choice.votes += 1
             selected_choice.passed_users.add(request.user)
             selected_choice.save()
-
+    poll.passed_users.add(request.user)
     return redirect('polls_app:results', pk=pk)
 
 
@@ -63,18 +59,18 @@ def make_text_vote(request, pk):
         user_choice = form.save(commit=False)
         user_choice.question = poll
         user_choice.votes += 1
-        # user_choice.passed_users.add(request.user)   # FIXME
         user_choice.save()
+        user_choice.passed_users.add(request.user)
+    poll.passed_users.add(request.user)
     return redirect('polls_app:results', pk=pk)
 
 
-def results(request, pk):
-    poll = get_object_or_404(Poll, pk=pk)
-    context = {'poll': poll}
-    return render(request, 'polls_app/results.html', context)
+class ResultsView(generic.DetailView):
+    model = Poll
+    template_name = "polls_app/results.html"
 
 
-##  serializers
+# serializers
 class PollViewSet(viewsets.ModelViewSet):
     serializer_class = PollSerializer
     queryset = Poll.objects.all()
