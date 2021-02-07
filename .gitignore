@@ -1,6 +1,7 @@
 __pycache__/
 */__pycache__/
 venv/
+.idea/
 db.sqlite3
 .pyc
 task.txt
