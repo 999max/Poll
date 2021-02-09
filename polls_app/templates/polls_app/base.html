@@ -11,6 +11,7 @@
     <a href="{% url 'polls_app:index' %}">Home</a>
     <a href="{% url 'polls_app:polls' %}">Active polls</a>
     <a href="{% url 'polls_app:completed' %}">Completed polls</a>
+    <a href="{% url 'polls_app:new_poll' %}">New poll</a>
 </div>
 <div align="right">
     {% if user.is_authenticated %}

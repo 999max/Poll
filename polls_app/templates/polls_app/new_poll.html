@@ -1,0 +1,18 @@
+{% extends "polls_app/base.html" %}
+
+{% block title %}
+    Make new poll
+{% endblock title %}
+
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        {% for formset in inlines %}
+            {{ formset.as_p }}
+        {% endfor %}
+        <button type="submit">Create poll</button>
+    </form>
+{% endblock content %}

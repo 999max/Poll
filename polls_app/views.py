@@ -1,10 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
 from rest_framework import viewsets
 from .models import Poll, Choice
-from .forms import ChoiceForm
+from .forms import ChoiceForm, PollForm, ChoiceUserInline
 from .serializers import PollSerializer, ChoiceSerializer
+from extra_views import CreateWithInlinesView
 
 
 def index(request):
@@ -29,6 +31,16 @@ class PollView(generic.DetailView):
         if self.object.answer_type == 'user_text':
             context['form'] = ChoiceForm()
         return context
+
+
+class CreatePollView(CreateWithInlinesView):
+    model = Poll
+    form_class = PollForm
+    inlines = [ChoiceUserInline]
+    template_name = 'polls_app/new_poll.html'
+
+    def get_success_url(self):
+        return reverse('polls_app:polls')
 
 
 class CompletedPollsView(generic.ListView):

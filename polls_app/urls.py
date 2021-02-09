@@ -12,4 +12,5 @@ urlpatterns = [
     path('polls/<int:pk>/make_text_vote/', views.make_text_vote, name='make_text_vote'),
     path('polls/<int:pk>/results/', views.ResultsView.as_view(), name='results'),
     path('polls/completed/', views.CompletedPollsView.as_view(), name='completed'),
+    path('polls/new_poll/', views.CreatePollView.as_view(), name='new_poll'),
 ]
