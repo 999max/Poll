@@ -12,7 +12,7 @@ CHOICE_TYPES = (
 class Poll(models.Model):
     title = models.CharField(max_length=150)
     question_text = models.TextField()
-    picture = models.ImageField(verbose_name="Image file", blank=True)
+    picture = models.ImageField(verbose_name="Image file", null=True)
     date_added = models.DateTimeField(auto_now_add=True, verbose_name="Poll's start date")
     date_ended = models.DateTimeField(verbose_name="Poll's end date")
     answer_type = models.CharField(max_length=150, choices=CHOICE_TYPES, default='1')
