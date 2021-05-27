@@ -16,6 +16,9 @@
         <h2>Make your answer</h2>
         <h4>Theme: {{ poll.title }}</h4>
         <p>{{ poll.question_text }}</p>
+        {% if poll.picture %}
+            <img src="{{ poll.picture.url }}" style="max-width: 60%;"/>
+        {% endif %}
 
         {% if poll.answer_type != 'user_text' %}
             <form action="{% url 'polls_app:make_vote' poll.id %}" method="post">
